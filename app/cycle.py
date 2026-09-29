@@ -4,6 +4,7 @@ from app.executor import execute_plan
 from app.learning import record_experiment, recent
 from app.evaluator import evaluate_results
 from app.auto_research import search_public_knowledge
+from app.memory_search import search_memory
 
 
 def run_cycle(goal, research_url=None):
@@ -11,7 +12,9 @@ def run_cycle(goal, research_url=None):
 
     # 1. Recuperar experiências anteriores
     previous = recent(5)
+    related_memories = search_memory(goal, limit=10)
     print("0. Experiências anteriores:", len(previous))
+    print("0.1. Memórias relacionadas:", len(related_memories))
 
     observation = f"Objetivo recebido: {goal}"
     agent.observe(observation)
@@ -36,6 +39,7 @@ def run_cycle(goal, research_url=None):
     context = {
         "goal": goal,
         "previous_experiments": previous,
+        "related_memories": related_memories,
     }
 
     thought = agent.think(str(context))
@@ -73,6 +77,7 @@ def run_cycle(goal, research_url=None):
         "research": research,
         "thought": thought,
         "previous_experiments": previous,
+        "related_memories": related_memories,
         "plan": plan,
         "results": results,
         "evaluation": evaluation,
