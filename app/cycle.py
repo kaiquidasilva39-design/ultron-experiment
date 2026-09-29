@@ -23,7 +23,14 @@ def run_cycle(goal, research_url=None):
         print("2. Pesquisa concluída:", research["url"])
     else:
         research = search_public_knowledge(goal)
+
+        for item in research:
+            agent.observe(
+                f"Conhecimento pesquisado: {item['title']} — {item['snippet']}"
+            )
+
         print("2. Pesquisa automática:", len(research), "resultados")
+        print("2.1. Resultados registrados na memória")
 
     # 3. Processamento usando o contexto disponível
     context = {
