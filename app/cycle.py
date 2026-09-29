@@ -3,6 +3,7 @@ from app.planner import create_plan, choose_steps
 from app.executor import execute_plan
 from app.learning import record_experiment, recent
 from app.evaluator import evaluate_results
+from app.auto_research import search_public_knowledge
 
 
 def run_cycle(goal, research_url=None):
@@ -21,8 +22,8 @@ def run_cycle(goal, research_url=None):
         research = agent.research(research_url)
         print("2. Pesquisa concluída:", research["url"])
     else:
-        research = None
-        print("2. Pesquisa não solicitada")
+        research = search_public_knowledge(goal)
+        print("2. Pesquisa automática:", len(research), "resultados")
 
     # 3. Processamento usando o contexto disponível
     context = {
