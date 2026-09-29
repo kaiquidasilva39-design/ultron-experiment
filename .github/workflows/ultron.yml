@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 */6 * * *"
 
+permissions:
+  contents: write
+
 jobs:
   cycle:
     runs-on: ubuntu-latest
@@ -20,6 +23,14 @@ jobs:
 
       - name: Instalar dependências
         run: pip install -r requirements.txt
+
+      - name: Restaurar memória
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: ultron-memory-${{ github.run_id }}
+          restore-keys: |
+            ultron-memory-
 
       - name: Executar ciclo
         run: python run.py
