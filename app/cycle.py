@@ -45,7 +45,7 @@ def run_cycle(goal, research_url=None):
     thought = agent.think(str(context))
     print("3. Processamento concluído")
 
-    steps = choose_steps(goal, previous)
+    steps = choose_steps(goal, previous, related_memories)
 
     plan = create_plan(goal, steps)
 

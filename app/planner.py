@@ -22,14 +22,18 @@ def create_plan(goal, steps):
     return plan
 
 
-def choose_steps(goal, previous_experiments=None):
+def choose_steps(goal, previous_experiments=None, related_memories=None):
     previous_experiments = previous_experiments or []
+    related_memories = related_memories or []
 
     steps = [
         "Analisar o objetivo",
         "Consultar experiências anteriores",
         "Identificar informações relevantes",
     ]
+
+    if related_memories:
+        steps.append("Usar memórias relacionadas ao objetivo")
 
     if previous_experiments:
         steps.append("Comparar com resultados anteriores")
