@@ -3,50 +3,59 @@ from app.planner import create_plan, choose_steps
 from app.executor import execute_plan
 from app.learning import record_experiment, recent
 from app.evaluator import evaluate_results
-from app.auto_research import search_public_knowledge
 from app.memory_search import search_memory
 from app.adaptation import suggest_adjustment
+from app.research_strategy import choose_research_strategy
 
 
 def run_cycle(goal, research_url=None):
     print("=== CICLO AUTÔNOMO CONTROLADO ===")
 
-    # 1. Recuperar experiências anteriores
     previous = recent(5)
     related_memories = search_memory(goal, limit=10)
+
     print("0. Experiências anteriores:", len(previous))
     print("0.1. Memórias relacionadas:", len(related_memories))
 
-    observation = f"Objetivo recebido: {goal}"
-    agent.observe(observation)
-
+    agent.observe(f"Objetivo recebido: {goal}")
     print("1. Observação registrada")
 
     if research_url:
         research = agent.research(research_url)
-        print("2. Pesquisa concluída:", research["url"])
+        strategy = "direct_url"
+        print("2. Pesquisa direta:", research["url"])
     else:
-        research = search_public_knowledge(goal)
+        selected = choose_research_strategy(goal, 5)
+        research = selected["results"]
+        strategy = selected["strategy"]
 
         for item in research:
+            title = item.get("title", "sem título")
+            snippet = item.get("snippet", "")
             agent.observe(
-                f"Conhecimento pesquisado: {item['title']} — {item['snippet']}"
+                f"Conhecimento pesquisado: {title} — {snippet}"
             )
 
         print("2. Pesquisa automática:", len(research), "resultados")
-        print("2.1. Resultados registrados na memória")
+        print("2.1. Estratégia escolhida:", strategy)
+        print("2.2. Desempenho:", selected["scores"])
 
-    # 3. Processamento usando o contexto disponível
-    context = {
-        "goal": goal,
-        "previous_experiments": previous,
-        "related_memories": related_memories,
-    }
+    thought = agent.think(
+        str({
+            "goal": goal,
+            "previous_experiments": previous,
+            "related_memories": related_memories,
+            "research_strategy": strategy,
+        })
+    )
 
-    thought = agent.think(str(context))
     print("3. Processamento concluído")
 
-    steps = choose_steps(goal, previous, related_memories)
+    steps = choose_steps(
+        goal,
+        previous,
+        related_memories
+    )
 
     plan = create_plan(goal, steps)
 
@@ -64,6 +73,7 @@ def run_cycle(goal, research_url=None):
         evaluation["score"],
         evaluation["trend"]
     )
+
     print(
         "6.1. Adaptação:",
         adaptation["action"],
@@ -74,7 +84,7 @@ def run_cycle(goal, research_url=None):
     record_experiment(
         title="Ciclo completo",
         action=goal,
-        result=f"{len(results)} etapas executadas",
+        result=f"{len(results)} etapas executadas; estratégia={strategy}",
         score=evaluation["score"],
     )
 
@@ -83,6 +93,7 @@ def run_cycle(goal, research_url=None):
     return {
         "goal": goal,
         "research": research,
+        "research_strategy": strategy,
         "thought": thought,
         "previous_experiments": previous,
         "related_memories": related_memories,
