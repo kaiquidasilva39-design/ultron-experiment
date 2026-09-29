@@ -2,6 +2,7 @@ from app.agent import agent
 from app.planner import create_plan, choose_steps
 from app.executor import execute_plan
 from app.learning import record_experiment, recent
+from app.evaluator import evaluate_results
 
 
 def run_cycle(goal, research_url=None):
@@ -42,14 +43,22 @@ def run_cycle(goal, research_url=None):
 
     print("5. Execução concluída:", len(results), "etapas")
 
+    evaluation = evaluate_results(results, previous)
+
+    print(
+        "6. Avaliação:",
+        evaluation["score"],
+        evaluation["trend"]
+    )
+
     record_experiment(
         title="Ciclo completo",
         action=goal,
         result=f"{len(results)} etapas executadas",
-        score=1.0,
+        score=evaluation["score"],
     )
 
-    print("6. Resultado registrado")
+    print("7. Resultado registrado")
 
     return {
         "goal": goal,
@@ -58,4 +67,5 @@ def run_cycle(goal, research_url=None):
         "previous_experiments": previous,
         "plan": plan,
         "results": results,
+        "evaluation": evaluation,
     }
