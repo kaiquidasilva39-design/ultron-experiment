@@ -1,0 +1,23 @@
+.env
+__pycache__/
+*.pyc
+logs/
+backups/
+memory/
+sandbox/workspaces/
+
+# Dados/runtime locais
+data/
+logs/
+backups/
+
+# Cópias de testes/deploy
+deploy_test/
+deploy_test_final/
+restore_test/
+
+# Ambiente local
+.env
+.venv/
+__pycache__/
+*.pyc

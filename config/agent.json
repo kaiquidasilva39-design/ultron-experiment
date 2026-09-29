@@ -1,0 +1,25 @@
+{
+  "name": "ULTRON-EXPERIMENT",
+  "version": "0.1.0",
+  "autonomous": true,
+  "persistent_memory": true,
+  "continuous_learning": true,
+  "research": true,
+  "planning": true,
+  "experimentation": true,
+  "self_evaluation": true,
+  "self_improvement": true,
+  "internet_research": true,
+  "code_generation": true,
+  "sandbox_execution": true,
+  "permissions": {
+    "public_information": true,
+    "authorized_systems": true,
+    "unauthorized_access": false,
+    "credential_theft": false,
+    "fraud": false,
+    "destructive_external_actions": false,
+    "malware": false,
+    "self_propagation": false
+  }
+}
