@@ -1,49 +1,50 @@
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 
-from app.memory import remember
-
-BASE = Path(__file__).resolve().parent.parent
-FILE = BASE / "data" / "plans.jsonl"
-
-FILE.parent.mkdir(parents=True, exist_ok=True)
+ROOT = Path(__file__).resolve().parent.parent
+PLAN_FILE = ROOT / "data" / "plans.jsonl"
 
 
 def create_plan(goal, steps):
+    PLAN_FILE.parent.mkdir(parents=True, exist_ok=True)
+
     plan = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
         "goal": goal,
         "steps": [
-            {
-                "id": i + 1,
-                "description": step,
-                "status": "pending",
-            }
+            {"index": i + 1, "action": step, "status": "pending"}
             for i, step in enumerate(steps)
         ],
     }
 
-    with FILE.open("a", encoding="utf-8") as f:
+    with PLAN_FILE.open("a", encoding="utf-8") as f:
         f.write(json.dumps(plan, ensure_ascii=False) + "\n")
-
-    remember("plan", f"Plano criado: {goal}")
 
     return plan
 
 
-def recent(limit=10):
-    if not FILE.exists():
+def choose_steps(goal, previous_experiments=None):
+    previous_experiments = previous_experiments or []
+
+    steps = [
+        "Analisar o objetivo",
+        "Consultar experiências anteriores",
+        "Identificar informações relevantes",
+    ]
+
+    if previous_experiments:
+        steps.append("Comparar com resultados anteriores")
+    else:
+        steps.append("Estabelecer uma linha de referência")
+
+    steps.append("Executar processamento controlado")
+    steps.append("Registrar resultado para aprendizado futuro")
+
+    return steps
+
+
+def recent(limit=5):
+    if not PLAN_FILE.exists():
         return []
 
-    lines = FILE.read_text(encoding="utf-8").splitlines()
-
-    result = []
-
-    for line in lines[-limit:]:
-        try:
-            result.append(json.loads(line))
-        except json.JSONDecodeError:
-            pass
-
-    return result
+    lines = PLAN_FILE.read_text(encoding="utf-8").splitlines()
+    return [json.loads(line) for line in lines[-limit:]]

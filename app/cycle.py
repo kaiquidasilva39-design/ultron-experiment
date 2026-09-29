@@ -1,5 +1,5 @@
 from app.agent import agent
-from app.planner import create_plan
+from app.planner import create_plan, choose_steps
 from app.executor import execute_plan
 from app.learning import record_experiment, recent
 
@@ -32,16 +32,9 @@ def run_cycle(goal, research_url=None):
     thought = agent.think(str(context))
     print("3. Processamento concluído")
 
-    plan = create_plan(
-        goal,
-        [
-            "Analisar o objetivo",
-            "Consultar experiências anteriores",
-            "Organizar as informações",
-            "Executar processamento controlado",
-            "Registrar resultado",
-        ],
-    )
+    steps = choose_steps(goal, previous)
+
+    plan = create_plan(goal, steps)
 
     print("4. Plano criado")
 
