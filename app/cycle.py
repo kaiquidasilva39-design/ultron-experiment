@@ -5,6 +5,7 @@ from app.learning import record_experiment, recent
 from app.evaluator import evaluate_results
 from app.auto_research import search_public_knowledge
 from app.memory_search import search_memory
+from app.adaptation import suggest_adjustment
 
 
 def run_cycle(goal, research_url=None):
@@ -56,11 +57,18 @@ def run_cycle(goal, research_url=None):
     print("5. Execução concluída:", len(results), "etapas")
 
     evaluation = evaluate_results(results, previous)
+    adaptation = suggest_adjustment(evaluation)
 
     print(
         "6. Avaliação:",
         evaluation["score"],
         evaluation["trend"]
+    )
+    print(
+        "6.1. Adaptação:",
+        adaptation["action"],
+        "-",
+        adaptation["reason"]
     )
 
     record_experiment(
@@ -81,4 +89,5 @@ def run_cycle(goal, research_url=None):
         "plan": plan,
         "results": results,
         "evaluation": evaluation,
+        "adaptation": adaptation,
     }
