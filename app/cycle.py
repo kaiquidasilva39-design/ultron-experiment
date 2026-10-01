@@ -46,6 +46,7 @@ def run_cycle(goal, research_url=None):
             "previous_experiments": previous,
             "related_memories": related_memories,
             "research_strategy": strategy,
+        "research_scores": selected["scores"] if not research_url else {},
         })
     )
 
@@ -66,6 +67,40 @@ def run_cycle(goal, research_url=None):
     print("5. Execução concluída:", len(results), "etapas")
 
     evaluation = evaluate_results(results, previous)
+
+    historical_scores = [
+        item.get("score")
+        for item in previous
+        if isinstance(item.get("score"), (int, float))
+    ]
+
+    if historical_scores:
+        historical_average = (
+            sum(historical_scores) / len(historical_scores)
+        )
+        last_score = historical_scores[-1]
+
+        if last_score > historical_average:
+            historical_trend = "improved"
+        elif last_score < historical_average:
+            historical_trend = "declined"
+        else:
+            historical_trend = "stable"
+
+        evaluation["history"] = {
+            "trend": historical_trend,
+            "average": round(historical_average, 4),
+            "samples": len(historical_scores),
+            "last_score": last_score,
+        }
+    else:
+        evaluation["history"] = {
+            "trend": "baseline",
+            "average": None,
+            "samples": 0,
+            "last_score": None,
+        }
+
     adaptation = suggest_adjustment(evaluation)
 
     print(
@@ -94,6 +129,7 @@ def run_cycle(goal, research_url=None):
         "goal": goal,
         "research": research,
         "research_strategy": strategy,
+        "research_scores": selected["scores"] if not research_url else {},
         "thought": thought,
         "previous_experiments": previous,
         "related_memories": related_memories,
